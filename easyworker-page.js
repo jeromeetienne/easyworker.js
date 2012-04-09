@@ -7,12 +7,8 @@
 var EasyWorker	= {};
 
 /**
- * create an EasyWorker.Instance
+ * the path to the easyworker-worker.js file
 */
-EasyWorker.create	= function(){
-	return new EasyWorker.Instance();
-}
-
 EasyWorker.urlWorkerJs	= 'easyworker-worker.js';
 
 /**
@@ -21,11 +17,13 @@ EasyWorker.urlWorkerJs	= 'easyworker-worker.js';
 EasyWorker.Instance	= function(){
 	this._replies	= {};
 	this._nextCallId= 42;
+	// create the webworker
 	this._worker	= new Worker(EasyWorker.urlWorkerJs);
-
+	// listen to 'message' from this._worker
 	this._worker.addEventListener('message', function(domEvent) {  
 		//console.log("Called back by the worker!\n", domEvent);
 		var event	= JSON.parse(domEvent.data);
+		// handle event.type === 'reply'
 		if( event.type === 'reply' ){
 			var callId	= event.data.callId;
 			var error	= event.data.error;

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<body>
+	<script src="easyworker-page.js"></script>
+	<script>
+		// configuration
+		EasyWorker.urlWorkerJs	= 'easyworker-worker.js'
+	
+		// create a worker instance
+		var worker	= new EasyWorker.Instance();
+	
+		// define two functions
+		worker.define('add', function(a, b, callback){
+			callback(null, a + b);
+		});
+		worker.define('sub', function(a, b, callback){
+			callback(null, a - b);
+		});
+	
+		// call the add function with generic fasion
+		worker.call('add', [1, 2], function(err, res){
+			console.log("add(1,2)=", res, '/', err);		
+		});
+	
+		// call the add function with shortcut fasion
+		worker.sub(1, 2, function(err, res){
+			console.log("sub(1,2)=", res, '/', err);		
+		});
+	</script>
+</body>
