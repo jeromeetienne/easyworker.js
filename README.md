@@ -1,18 +1,22 @@
 ## create a webworker
+
 ```javascript
-    var worker	= EasyWorker.create({
-        exports	: {
-            add	: function(a, b, callback){
-                callback(null, a + b);
-            },
-            sub	: function(a, b, callback){
-                callback(null, a - b);
-            }
-        }
-    });
+    var worker	= EasyWorker.create();
 ```
 
-## default function call
+## define function call
+
+```javascript
+	worker.define('add', function(a, b, callback){
+		callback(null, a + b);
+	});
+	worker.define('sub', function(a, b, callback){
+		callback(null, a - b);
+	});
+```
+
+## generic function call
+
 ```javascript
     worker.call('add', [1, 2], function(err, res){
         console.log("add(1,2)=", res, '/', err);		
@@ -23,6 +27,7 @@
 ```
 
 ## shortcut to call
+
 ```javascript
     worker.add(1, 2, function(err, res){
         console.log("add(1,2)=", res, '/', err);		

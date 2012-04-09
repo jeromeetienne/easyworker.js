@@ -12,41 +12,35 @@ var console	= {
 }
 
 var exports	= {}
-var configured	= false;
 
 /**
  * handle the config
 */
-function handleConfig(msgData){
-	for( var fnName in msgData.exports ){
-		var fnString	= msgData.exports[fnName];
-		var codeStr	= 'exports[fnName] = '+fnString+';';
-		eval(codeStr);
-	}
+function handleDefine(data){
+	var codeStr	= 'exports[data.fnName] = '+data.method+';';
+	//console.log("codeStr "+codeStr);
+	eval(codeStr);
 }
 
 /**
  * handle the call
 */
-function handleCall(msgData){
-	var fnName	= msgData.fnName;
-	var fnArgs	= msgData.fnArgs;
-	var callId	= msgData.callId;
+function handleCall(data){
 	// log to debug
-	console.assert(exports[fnName]);
-	// push the callback to notify the error
-	fnArgs.push(function(error, result){
+	console.assert(exports[data.fnName]);
+	// push the callback to notify back the caller
+	data.fnArgs.push(function(error, result){
 		self.postMessage(JSON.stringify({
 			type	: 'reply',
 			data	: {
-				callId	: callId,
+				callId	: data.callId,
 				error	: error,
 				result	: result
 			}
 		}));
 	});
 	// actually call the function	
-	exports[fnName].apply(undefined, fnArgs)
+	exports[data.fnName].apply(undefined, data.fnArgs)
 }
 
 // just echo
@@ -55,11 +49,9 @@ self.addEventListener('message', function(domEvent){
 	// parse message
 	var event	= JSON.parse(domEvent.data);
 	// parse depending on event.type
-	if( event.type === "config" ){
-		configured	= true;
-		handleConfig(event.data);
+	if( event.type === "define" ){
+		handleDefine(event.data);
 	}else if( event.type === "call" ){
-		console.assert(configured);
 		handleCall(event.data);
 	}else	console.assert(false);
 }, false);
