@@ -1,6 +1,9 @@
 easyworker makes it easy to create worker.
 All is happening in the main thread.
 no need to setup external .js for workers.
+See
+[index.html](https://github.com/jeromeetienne/easyworker.js/blob/master/index.html)
+for an example.
 
 ## create a webworker
 
@@ -32,24 +35,22 @@ worker.define('add', function(a, b, callback){
 });
 ```
 
-## generic function call
+## call a function in the worker
 
-To call a defined function, you can use```.call()```.
+To call a define function, a shortcut is created for convenience.
+Thus you can call the 'add()' function by a line like this.
 
 ```javascript
-worker.call('add', [1, 2], function(err, res){
+worker.add(1, 2, function(err, res){
     console.log("add(1,2)=", res, '/', err);		
 });
 ```
 
-### shortcut to call
-
-```.call()``` is the canonical way, but it isnt too instinctive.
-For convenience, a shortcut is created. thus you can call the 'add()' function
-by a line like this.
+For completness, ```.call()``` is the canonical way to call a function.
+But it isnt too instinctive.
 
 ```javascript
-worker.add(1, 2, function(err, res){
+worker.call('add', [1, 2], function(err, res){
     console.log("add(1,2)=", res, '/', err);		
 });
 ```
