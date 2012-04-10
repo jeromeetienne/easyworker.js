@@ -1,7 +1,7 @@
 easyworker makes it easy to create worker.
 All is happening in the main thread.
 no need to setup external .js for workers.
-See
+See 
 [index.html](https://github.com/jeromeetienne/easyworker.js/blob/master/index.html)
 for an example.
 
