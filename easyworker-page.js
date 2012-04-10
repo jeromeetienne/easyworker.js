@@ -7,9 +7,14 @@
 var EasyWorker	= {};
 
 /**
- * the path to the easyworker-worker.js file
+ * the path to the easyworker-worker.js file.
+ * TODO it would be nice to have a single file
 */
 EasyWorker.urlWorkerJs	= 'easyworker-worker.js';
+
+//////////////////////////////////////////////////////////////////////////////////
+//										//
+//////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Constructor
@@ -35,25 +40,6 @@ EasyWorker.Instance	= function(){
 			callback(error, result);
 		}else	console.assert(false, 'unexpected data type');
 	}.bind(this), false);
-return;
-	// compute worker configuration
-	var config	= {
-		type	: "config",
-		data	: { exports : {} }
-	};
-	for( var fnName in opts.exports ){
-		config.data.exports[fnName]	= opts.exports[fnName].toString();
-		if( this[fnName] )	continue;
-		(function(fnName){
-			this[fnName]	= function(){
-				var fnArgs	= Array.prototype.slice.call(arguments);
-				var callback	= fnArgs.pop();
-				this.call(fnName, fnArgs, callback);
-			}
-		}.bind(this))(fnName);
-	}
-	// send the config and start the worker
-	worker.postMessage(JSON.stringify(config));
 };
 
 /**
@@ -63,13 +49,20 @@ EasyWorker.Instance.prototype.destroy	= function(){
 	this._worker.terminate();
 };
 
-EasyWorker.Instance.prototype.define	= function(fnName, callback){
+//////////////////////////////////////////////////////////////////////////////////
+//										//
+//////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * define a function in the woker
+*/
+EasyWorker.Instance.prototype.define	= function(fnName, method){
 	// define alias
 	if( !this[fnName] ){
 		this[fnName]	= function(){
 			var fnArgs	= Array.prototype.slice.call(arguments);
-			var callback	= fnArgs.pop();
-			this.call(fnName, fnArgs, callback);
+			var method	= fnArgs.pop();
+			this.call(fnName, fnArgs, method);
 		}
 	}
 	// send the config and start the worker
@@ -77,11 +70,14 @@ EasyWorker.Instance.prototype.define	= function(fnName, callback){
 		type	: 'define',
 		data	: {
 			fnName	: fnName,
-			method	: callback.toString()
+			method	: method.toString()
 		}
 	}));
 };
 
+/**
+ * call a function in the worker
+*/
 EasyWorker.Instance.prototype.call	= function(fnName, fnArgs, callback){
 	// get callId
 	var callId	= this._nextCallId++;
@@ -95,6 +91,19 @@ EasyWorker.Instance.prototype.call	= function(fnName, fnArgs, callback){
 			callId	: callId,
 			fnName	: fnName,
 			fnArgs	: fnArgs
+		}
+	}));
+};
+
+/**
+ * call a function in the worker
+*/
+EasyWorker.Instance.prototype.run	= function(fn){
+	// post message
+	this._worker.postMessage(JSON.stringify({
+		type	: "run",
+		data	: {
+			fn	: fn.toString()
 		}
 	}));
 };
